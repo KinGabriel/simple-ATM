@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace ATM_Application
 {
     public class Controller
     {
+        private string json = File.ReadAllText("users.json");
         public void run()
         {
             MenuLogOrReg();
@@ -58,12 +62,65 @@ namespace ATM_Application
 
         private void OpenAccount()
         {
-            string userName = Console.ReadLine();
+            string userName, password,retypePassword;
             Console.Clear();
-            Console.WriteLine("Enter your username: ");
+            do
+            {
+                Console.WriteLine("Enter your username: ");
+                userName = Console.ReadLine();
+                if (isUserNameTaken(userName))
+                {
+                    Console.WriteLine("Username is already taken!");
+                }
+                else
+                {
+                    break;
+                }
+                
+            } while (true);
             
+            Console.WriteLine("Enter your password: ");
+            password = Console.ReadLine();
+            do
+            {
+                Console.WriteLine("Enter your retype password: ");
+                retypePassword = Console.ReadLine();
+                if (retypePassword != password)
+                {
+                    Console.WriteLine("Password Unmatched! please try again");
+                }
+            }while(retypePassword != password);
+
+            if (registerToJson(userName, password))
+            {
+             Console.WriteLine("Account successfully registered!");   
+            }
+            else
+            {
+                Console.WriteLine("Error on registration!");
+            }
         }
 
+        private bool isUserNameTaken(string userName)
+        {
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+            foreach (var user in users)
+            {
+                if (user.userName == userName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        private bool registerToJson(string username, string password)
+        {
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
+            User user = new User { userName = username, password = password };
+            string writeJson = JsonConvert.SerializeObject(user, Formatting.Indented);
+            return true;
+        }
         private void logIn()
         {
             while (true)
@@ -89,11 +146,10 @@ namespace ATM_Application
 
         private bool validateLogIn(string userName, string password)
         {
-            string[] readCSV = File.ReadAllLines("../../../CSV/users.csv");
-            foreach (string line in readCSV)
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
+            foreach (var user in users)
             {
-                string[] splitLine = line.Split(',');
-                if (splitLine[0] == userName && splitLine[1] == password)
+                if (user.userName == userName && user.password == password)
                 {
                     return true;
                 }

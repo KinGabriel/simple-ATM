@@ -1,6 +1,0 @@
-C:\Users\Acer\RiderProjects\simple-ATM\ATM Application\obj\Debug\ATM Application.csproj.AssemblyReference.cache
-C:\Users\Acer\RiderProjects\simple-ATM\ATM Application\obj\Debug\ATM Application.csproj.CoreCompileInputs.cache
-C:\Users\Acer\RiderProjects\simple-ATM\ATM Application\bin\Debug\ATM_Application.exe
-C:\Users\Acer\RiderProjects\simple-ATM\ATM Application\bin\Debug\ATM_Application.pdb
-C:\Users\Acer\RiderProjects\simple-ATM\ATM Application\obj\Debug\ATM_Application.exe
-C:\Users\Acer\RiderProjects\simple-ATM\ATM Application\obj\Debug\ATM_Application.pdb
