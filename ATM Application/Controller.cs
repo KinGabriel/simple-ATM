@@ -116,9 +116,9 @@ namespace ATM_Application
         
         private bool registerToJson(string username, string password)
         {
-            List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
             User user = new User { userName = username, password = password };
             string writeJson = JsonConvert.SerializeObject(user, Formatting.Indented);
+            File.WriteAllText("users.json", writeJson);
             return true;
         }
         private void logIn()

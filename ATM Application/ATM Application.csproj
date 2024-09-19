@@ -50,8 +50,8 @@
         <Compile Include="User.cs" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="bin\Debug\users.json" />
       <Content Include="users.csv" />
-      <Content Include="users.json" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
