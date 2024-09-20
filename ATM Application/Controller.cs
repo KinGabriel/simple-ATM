@@ -9,15 +9,18 @@ namespace ATM_Application
     public class Controller
     {
         private string json = File.ReadAllText("users.json");
+        private string currentUser;
+
         public void run()
         {
             MenuLogOrReg();
-           
+
         }
+
 /*
  * Menu for the login and register
  */
-            private void MenuLogOrReg()
+        private void MenuLogOrReg()
         {
             while (true)
             {
@@ -27,6 +30,7 @@ namespace ATM_Application
                 GetChoiceLogOrReg();
             }
         }
+
 /*
  * Method that let the user select his/her choice
  */
@@ -42,6 +46,7 @@ namespace ATM_Application
                     switch (choice)
                     {
                         case 1:
+                            logIn();
                             break;
                         case 2:
                             OpenAccount();
@@ -62,7 +67,7 @@ namespace ATM_Application
 
         private void OpenAccount()
         {
-            string userName, password,retypePassword;
+            string userName, password, retypePassword;
             Console.Clear();
             do
             {
@@ -76,9 +81,9 @@ namespace ATM_Application
                 {
                     break;
                 }
-                
+
             } while (true);
-            
+
             Console.WriteLine("Enter your password: ");
             password = Console.ReadLine();
             do
@@ -89,11 +94,11 @@ namespace ATM_Application
                 {
                     Console.WriteLine("Password Unmatched! please try again");
                 }
-            }while(retypePassword != password);
+            } while (retypePassword != password);
 
             if (registerToJson(userName, password))
             {
-             Console.WriteLine("Account successfully registered!");   
+                Console.WriteLine("Account successfully registered!");
             }
             else
             {
@@ -111,9 +116,10 @@ namespace ATM_Application
                     return true;
                 }
             }
+
             return false;
         }
-        
+
         private bool registerToJson(string username, string password)
         {
             User user = new User { userName = username, password = password };
@@ -121,6 +127,7 @@ namespace ATM_Application
             File.WriteAllText("users.json", writeJson);
             return true;
         }
+
         private void logIn()
         {
             while (true)
@@ -135,11 +142,31 @@ namespace ATM_Application
                 if (validateLogIn(userName, password))
                 {
                     Console.WriteLine("Log in successful!");
-                }else
+                    currentUser = userName;
+                    atmMenu();
+                }
+                else
                 {
                     Console.WriteLine("Log in failed!");
-                    Console.WriteLine("Do you want to retry your login?[y/n]");
-                    
+                    while (true)
+                    {
+                        Console.WriteLine("Do you want to retry your login?[y/n]");
+                        char choice = Console.ReadKey().KeyChar;
+                        if (choice == 'y' || choice == 'Y')
+                        {
+                            break;
+                        }
+                        else if (choice == 'n' || choice == 'N')
+                        {
+                            MenuLogOrReg();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input!");
+                        }
+                    }
+
+
                 }
             }
         }
@@ -154,9 +181,55 @@ namespace ATM_Application
                     return true;
                 }
             }
+
             return false;
         }
-        
+
+
+        private void atmMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("====================");
+                Console.WriteLine("1. Check Balance");
+                Console.WriteLine("2. Withdraw cash");
+                Console.WriteLine("3. Deposit Cash");
+                Console.WriteLine("4. Exit");
+                choiceMenu();
+            }
+        }
+
+        private void choiceMenu()
+        {
+            int choice;
+            Console.WriteLine("Enter your choice: ");
+            choice = int.Parse(Console.ReadLine());
+            switch (choice)
+            {
+                case 1:
+                    checkBalance();
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void checkBalance()
+        {
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
+            foreach (var user in users)
+            {
+                if (user.userName == currentUser)
+                    Console.WriteLine("Your total balance: " + user.amount);
+                    Console.WriteLine("Press enter to continue...");
+                    string input = Console.ReadLine();
+            }
+        }
     }
-    
 }
