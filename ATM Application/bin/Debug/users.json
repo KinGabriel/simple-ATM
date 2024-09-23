@@ -1,7 +1,12 @@
 [
-{
-  "userName": "Kin",
-  "password": "123456",
-  "amount": 0.0
-}
-  ]
+  {
+    "UserName": "Kin",
+    "Password": "123456",
+    "Amount": 8000.0
+  },
+  {
+    "UserName": "Nics",
+    "Password": "nicnic",
+    "Amount": 7000.0
+  }
+]

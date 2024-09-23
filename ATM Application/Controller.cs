@@ -111,7 +111,7 @@ namespace ATM_Application
             List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
             foreach (var user in users)
             {
-                if (user.userName == userName)
+                if (user.UserName == userName)
                 {
                     return true;
                 }
@@ -122,8 +122,10 @@ namespace ATM_Application
 
         private bool registerToJson(string username, string password)
         {
-            User user = new User { userName = username, password = password };
-            string writeJson = JsonConvert.SerializeObject(user, Formatting.Indented);
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+            User newUser = new User { UserName = username, Password = password };
+            users.Add(newUser);
+            string writeJson = JsonConvert.SerializeObject(users, Formatting.Indented);
             File.WriteAllText("users.json", writeJson);
             return true;
         }
@@ -173,10 +175,10 @@ namespace ATM_Application
 
         private bool validateLogIn(string userName, string password)
         {
-            List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
             foreach (var user in users)
             {
-                if (user.userName == userName && user.password == password)
+                if (user.UserName == userName && user.Password == password)
                 {
                     return true;
                 }
@@ -212,6 +214,7 @@ namespace ATM_Application
                 case 2:
                     break;
                 case 3:
+                    depositCash();
                     break;
                 case 4:
                     break;
@@ -225,11 +228,41 @@ namespace ATM_Application
             List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
             foreach (var user in users)
             {
-                if (user.userName == currentUser)
-                    Console.WriteLine("Your total balance: " + user.amount);
+                if (user.UserName == currentUser)
+                    Console.WriteLine("Your total balance: " + user.Amount);
                     Console.WriteLine("Press enter to continue...");
                     string input = Console.ReadLine();
             }
+        }
+
+        public void depositCash()
+        {
+            double amount;
+            Console.WriteLine("Enter the amount you want to deposit: ");
+            amount = double.Parse(Console.ReadLine()); 
+            if (depostiJSON(amount))
+                    {
+                        Console.WriteLine("Succesfully deposited!");
+                        Console.WriteLine("Your total balance: " + amount);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Problem occured!");
+                   }
+        }
+        
+        public bool depostiJSON(double amount)
+        {
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+            User updateAmount = users.FirstOrDefault(user => user.UserName == currentUser);
+            if (updateAmount != null)
+            {
+                updateAmount.Amount += amount;
+                string updatedJson = JsonConvert.SerializeObject(users, Formatting.Indented);
+                File.WriteAllText("users.json", updatedJson);
+                return true; 
+            }
+            return false; 
         }
     }
 }
