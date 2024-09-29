@@ -8,7 +8,6 @@ namespace ATM_Application
 {
     public class Controller
     {
-        private string json = File.ReadAllText("users.json");
         private string currentUser;
 
         public void run()
@@ -46,7 +45,7 @@ namespace ATM_Application
                     switch (choice)
                     {
                         case 1:
-                            logIn();
+                            LogIn();
                             break;
                         case 2:
                             OpenAccount();
@@ -73,7 +72,7 @@ namespace ATM_Application
             {
                 Console.WriteLine("Enter your username: ");
                 userName = Console.ReadLine();
-                if (isUserNameTaken(userName))
+                if (IsUserNameTaken(userName))
                 {
                     Console.WriteLine("Username is already taken!");
                 }
@@ -96,7 +95,7 @@ namespace ATM_Application
                 }
             } while (retypePassword != password);
 
-            if (registerToJson(userName, password))
+            if (RegisterToJson(userName, password))
             {
                 Console.WriteLine("Account successfully registered!");
             }
@@ -106,8 +105,9 @@ namespace ATM_Application
             }
         }
 
-        private bool isUserNameTaken(string userName)
+        private bool IsUserNameTaken(string userName)
         {
+            string json = File.ReadAllText("users.json");
             List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
             foreach (var user in users)
             {
@@ -120,8 +120,9 @@ namespace ATM_Application
             return false;
         }
 
-        private bool registerToJson(string username, string password)
+        private bool RegisterToJson(string username, string password)
         {
+            string json = File.ReadAllText("users.json");
             List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
             User newUser = new User { UserName = username, Password = password };
             users.Add(newUser);
@@ -130,22 +131,20 @@ namespace ATM_Application
             return true;
         }
 
-        private void logIn()
+        private void LogIn()
         {
             while (true)
             {
-                string userName;
-                string password;
                 Console.Clear();
                 Console.WriteLine("Enter your username: ");
-                userName = Console.ReadLine();
+                var userName = Console.ReadLine();
                 Console.WriteLine("Enter your password: ");
-                password = Console.ReadLine();
-                if (validateLogIn(userName, password))
+                var password = Console.ReadLine();
+                if (ValidateLogIn(userName, password))
                 {
                     Console.WriteLine("Log in successful!");
                     currentUser = userName;
-                    atmMenu();
+                    AtmMenu();
                 }
                 else
                 {
@@ -173,8 +172,9 @@ namespace ATM_Application
             }
         }
 
-        private bool validateLogIn(string userName, string password)
+        private bool ValidateLogIn(string userName, string password)
         {
+            string json = File.ReadAllText("users.json");
             List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
             foreach (var user in users)
             {
@@ -188,7 +188,7 @@ namespace ATM_Application
         }
 
 
-        private void atmMenu()
+        private void AtmMenu()
         {
             while (true)
             {
@@ -203,56 +203,58 @@ namespace ATM_Application
 
         private void choiceMenu()
         {
-            int choice;
             Console.WriteLine("Enter your choice: ");
-            choice = int.Parse(Console.ReadLine());
+            var choice = int.Parse(Console.ReadLine());
             switch (choice)
             {
                 case 1:
-                    checkBalance();
+                    CheckBalance();
                     break;
                 case 2:
+                    WithdrawCash();
                     break;
                 case 3:
-                    depositCash();
+                    DepositCash();
                     break;
                 case 4:
                     break;
                 default:
+                    Console.WriteLine("Invalid input! please try again...");
                     break;
             }
         }
+        
 
-        public void checkBalance()
+        private void CheckBalance()
         {
+            string json = File.ReadAllText("users.json");
             List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
             foreach (var user in users)
             {
                 if (user.UserName == currentUser)
+                {
                     Console.WriteLine("Your total balance: " + user.Amount);
                     Console.WriteLine("Press enter to continue...");
                     string input = Console.ReadLine();
+                }
             }
         }
 
-        public void depositCash()
+        private void DepositCash()
         {
-            double amount;
             Console.WriteLine("Enter the amount you want to deposit: ");
-            amount = double.Parse(Console.ReadLine()); 
-            if (depostiJSON(amount))
-                    {
-                        Console.WriteLine("Succesfully deposited!");
-                        Console.WriteLine("Your total balance: " + amount);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Problem occured!");
-                   }
+            var amount = double.Parse(Console.ReadLine());
+            if (!DepositJson(amount))
+            {
+                Console.WriteLine("Problem occured!");
+            }
+            Console.WriteLine("Press enter to continue...");
+            string input = Console.ReadLine();
         }
-        
-        public bool depostiJSON(double amount)
+
+        private bool DepositJson(double amount)
         {
+            string json = File.ReadAllText("users.json");
             List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
             User updateAmount = users.FirstOrDefault(user => user.UserName == currentUser);
             if (updateAmount != null)
@@ -260,9 +262,45 @@ namespace ATM_Application
                 updateAmount.Amount += amount;
                 string updatedJson = JsonConvert.SerializeObject(users, Formatting.Indented);
                 File.WriteAllText("users.json", updatedJson);
-                return true; 
+                Console.WriteLine("Succesfully deposited!");
+                Console.WriteLine("Your total balance: " +  updateAmount.Amount);
+                return true;
             }
-            return false; 
+
+            return false;
+        }
+
+        private void WithdrawCash()
+        {
+            Console.WriteLine("Enter the amount you want to withdraw: ");
+            var amount = double.Parse(Console.ReadLine());
+            if (!WithdrawJson(amount))
+            {
+                Console.WriteLine("Insufficient balance!");
+            }
+            Console.WriteLine("Press enter to continue...");
+            string input = Console.ReadLine();
+        }
+
+        private bool WithdrawJson(double amount)
+        {
+            string json = File.ReadAllText("users.json");
+            List<User> users = JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+            User updateAmount = users.FirstOrDefault(user => user.UserName == currentUser);
+            if (updateAmount != null)
+            {
+                if (updateAmount.Amount < amount)
+                {
+                    return false;
+                }
+                updateAmount.Amount -= amount;
+                string updatedJson = JsonConvert.SerializeObject(users, Formatting.Indented);
+                File.WriteAllText("users.json", updatedJson);
+                Console.WriteLine("Succesfully withdrawn!");
+                Console.WriteLine("Your total balance: " + updateAmount.Amount);
+                return true;
+            }
+            return false;
         }
     }
 }
