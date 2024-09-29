@@ -8,15 +8,15 @@ namespace ATM_Application
 {
     public class Controller
     {
-        private string currentUser;
+        private string currentUser; // To store the username of the current user
 
         public void run()
         {
+            Console.WriteLine("=======Atm Application=======");
             MenuLogOrReg();
-
         }
 
-/*
+/**
  * Menu for the login and register
  */
         private void MenuLogOrReg()
@@ -30,7 +30,7 @@ namespace ATM_Application
             }
         }
 
-/*
+/**
  * Method that let the user select his/her choice
  */
         private void GetChoiceLogOrReg()
@@ -40,7 +40,7 @@ namespace ATM_Application
                 while (true)
                 {
                     int choice;
-                    Console.WriteLine("Enter your choice: ");
+                    Console.Write("Enter your choice: ");
                     choice = int.Parse(Console.ReadLine());
                     switch (choice)
                     {
@@ -63,7 +63,9 @@ namespace ATM_Application
                 Console.WriteLine("Invalid choice! the allowed inputs are: 1-3");
             }
         }
-
+/**
+ * Method which will allow the user to open an account
+ */
         private void OpenAccount()
         {
             string userName, password, retypePassword;
@@ -83,11 +85,11 @@ namespace ATM_Application
 
             } while (true);
 
-            Console.WriteLine("Enter your password: ");
+            Console.Write("Enter your password: ");
             password = Console.ReadLine();
             do
             {
-                Console.WriteLine("Enter your retype password: ");
+                Console.Write("Enter your retype password: ");
                 retypePassword = Console.ReadLine();
                 if (retypePassword != password)
                 {
@@ -104,7 +106,9 @@ namespace ATM_Application
                 Console.WriteLine("Error on registration!");
             }
         }
-
+/**
+ * Check the json file if the username is already taken
+ */
         private bool IsUserNameTaken(string userName)
         {
             string json = File.ReadAllText("users.json");
@@ -119,7 +123,9 @@ namespace ATM_Application
 
             return false;
         }
-
+/**
+ * Add the user in the Json file 
+ */
         private bool RegisterToJson(string username, string password)
         {
             string json = File.ReadAllText("users.json");
@@ -130,15 +136,17 @@ namespace ATM_Application
             File.WriteAllText("users.json", writeJson);
             return true;
         }
-
+/**
+ * Method that will handle the user login
+ */
         private void LogIn()
         {
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("Enter your username: ");
+                Console.Write("Enter your username: ");
                 var userName = Console.ReadLine();
-                Console.WriteLine("Enter your password: ");
+                Console.Write("Enter your password: ");
                 var password = Console.ReadLine();
                 if (ValidateLogIn(userName, password))
                 {
@@ -171,7 +179,9 @@ namespace ATM_Application
                 }
             }
         }
-
+/**
+ * Method that will check or validate user login in the Json file
+ */
         private bool ValidateLogIn(string userName, string password)
         {
             string json = File.ReadAllText("users.json");
@@ -187,7 +197,9 @@ namespace ATM_Application
             return false;
         }
 
-
+        /**
+         * Method that will display the menu of the program
+         */
         private void AtmMenu()
         {
             while (true)
@@ -200,31 +212,44 @@ namespace ATM_Application
                 choiceMenu();
             }
         }
-
+        /**
+         * Method that will display the menu of the program
+         */
         private void choiceMenu()
         {
-            Console.WriteLine("Enter your choice: ");
-            var choice = int.Parse(Console.ReadLine());
-            switch (choice)
+            try
             {
-                case 1:
-                    CheckBalance();
-                    break;
-                case 2:
-                    WithdrawCash();
-                    break;
-                case 3:
-                    DepositCash();
-                    break;
-                case 4:
-                    break;
-                default:
-                    Console.WriteLine("Invalid input! please try again...");
-                    break;
+                Console.Write("Enter your choice: ");
+                var choice = int.Parse(Console.ReadLine());
+                switch (choice)
+                {
+                    case 1:
+                        CheckBalance();
+                        break;
+                    case 2:
+                        WithdrawCash();
+                        break;
+                    case 3:
+                        DepositCash();
+                        break;
+                    case 4:
+                        currentUser = "";
+                        MenuLogOrReg();
+                        break;
+                    default:
+                        Console.WriteLine("Invalid input! please try again...");
+                        break;
+                }
+            }
+            catch (FormatException e)
+            {
+                Console.WriteLine("Invalid input! please try again...");
             }
         }
         
-
+        /**
+         * Method that will check the account balance of the user in the JSON file
+         */
         private void CheckBalance()
         {
             string json = File.ReadAllText("users.json");
@@ -239,10 +264,12 @@ namespace ATM_Application
                 }
             }
         }
-
+        /**
+         * Method that will handle the deposit process of the user
+         */
         private void DepositCash()
         {
-            Console.WriteLine("Enter the amount you want to deposit: ");
+            Console.Write("Enter the amount you want to deposit: ");
             var amount = double.Parse(Console.ReadLine());
             if (!DepositJson(amount))
             {
@@ -251,7 +278,9 @@ namespace ATM_Application
             Console.WriteLine("Press enter to continue...");
             string input = Console.ReadLine();
         }
-
+        /**
+         * Method that will update the deposit transaction of the user in the JSON file
+         */
         private bool DepositJson(double amount)
         {
             string json = File.ReadAllText("users.json");
@@ -269,10 +298,12 @@ namespace ATM_Application
 
             return false;
         }
-
+        /**
+         * Method that will handle the cash withdrawal process of the program
+         */
         private void WithdrawCash()
         {
-            Console.WriteLine("Enter the amount you want to withdraw: ");
+            Console.Write("Enter the amount you want to withdraw: ");
             var amount = double.Parse(Console.ReadLine());
             if (!WithdrawJson(amount))
             {
@@ -281,7 +312,9 @@ namespace ATM_Application
             Console.WriteLine("Press enter to continue...");
             string input = Console.ReadLine();
         }
-
+    /**
+     * Method that will update the JSON file in the cash withdrawal process
+     */
         private bool WithdrawJson(double amount)
         {
             string json = File.ReadAllText("users.json");
